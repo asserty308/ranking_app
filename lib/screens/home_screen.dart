@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ranking_app/screens/list_detail_screen.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,22 +12,23 @@ class HomeScreenState extends State<HomeScreen> {
 
   /// Creates a list tile from the name entered in a dialog
   void addNewList(BuildContext context) async  {
-    var name = await showAddListDialog(context);
-    var key = 'list_$name';
+    var title = await showAddListDialog(context);
+    var key = 'list_$title';
 
     setState(() {
-      if (name == null) {
+      if (title == null) {
         return;
       }
 
-      // TODO: check name already exists
+      // TODO: check if title already exists
+      // TODO: create ListDM and add to db
         
       listData.add(
         ListTile(
           key: ValueKey(key),
-          title: Text(name),
+          title: Text(title),
           onTap: () {
-            showList(key);
+            showList(context, key, title);
           },
          )
        );
@@ -66,8 +68,12 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void showList(String key) {
-    // TODO: go to 'ListDetailScreen'
+  void showList(BuildContext context, String key, String title) {
+    Navigator.pushNamed(
+      context, 
+      '/list_detail',
+      arguments: ListDetailScreenArguments(key, title),
+    );
   }
 
   @override
