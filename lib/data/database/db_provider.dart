@@ -1,5 +1,4 @@
 import 'package:path/path.dart';
-import 'package:ranking_app/data/models/list.dart';
 import 'package:sqflite/sqflite.dart';
 
 class RankingDatabaseProvider {
@@ -39,40 +38,5 @@ class RankingDatabaseProvider {
       // path to perform database upgrades and downgrades.
       version: _version,
     );
-  }
-
-  insertNewList(ListDM list) async {
-    final db = await database;
-    db.insert(
-      'Lists', 
-      list.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.abort
-    );
-  }
-
-  Future<ListDM> getListWithKey(String key) async {
-    final db = await database;
-    var response = await db.query('Lists', where: 'key = ?', whereArgs: [key]);
-    return response.isNotEmpty ? ListDM.fromMap(response.first) : null;
-  }
-
-  Future<List<ListDM>> getAllLists() async {
-    final db = await database;
-
-    final List<Map<String, dynamic>> maps = await db.query('Lists');
-
-    return List.generate(maps.length, (i) {
-      return ListDM(
-        key: maps[i]['key'],
-        title: maps[i]['title'],
-        subtitle: maps[i]['subtitle'],
-        position: maps[i]['index'],
-      );
-    });
-  }
-
-  Future<int> getListsLength() async {
-    final db = await database;
-    return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM Lists'));
   }
 }

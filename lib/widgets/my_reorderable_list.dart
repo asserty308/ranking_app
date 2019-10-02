@@ -28,6 +28,8 @@ class MyReorderableListState extends State<MyReorderableList> {
            // remove item at old index and add to new index
            final item = listData.removeAt(oldIndex);
            listData.insert(newIndex, item);
+
+           // TODO: Update index in Lists table
           });
         },
         children: listData,

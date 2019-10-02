@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ranking_app/data/database/db_provider.dart';
+import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list.dart';
 import 'package:ranking_app/screens/list_detail_screen.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
@@ -43,7 +43,7 @@ class HomeScreenState extends State<HomeScreen> {
   void reloadData() async {
     listData.clear();
 
-    var models = await RankingDatabaseProvider.db.getAllLists();
+    var models = await ListTableProvider.table.getAll();
 
     for (var m in models) {
       listData.add(
@@ -66,14 +66,14 @@ class HomeScreenState extends State<HomeScreen> {
     var title = await showAddListDialog(context);
     var key = 'list_$title';
     key = key.toLowerCase().replaceAll(' ', '_');
-    var index = await RankingDatabaseProvider.db.getListsLength();
+    var index = await ListTableProvider.table.tableCount();
 
     if (title == null) {
       return;
     }
 
     // check if title already exists
-    var existingEntry = await RankingDatabaseProvider.db.getListWithKey(key);
+    var existingEntry = await ListTableProvider.table.getWithKey(key);
 
     if (existingEntry != null) {
       showEntryAlreadyExistsDialog(context);
@@ -88,7 +88,7 @@ class HomeScreenState extends State<HomeScreen> {
       position: index
     );
 
-    RankingDatabaseProvider.db.insertNewList(newList);
+    ListTableProvider.table.insert(newList);
 
     // reload data to show the new entry
     setState(() {
