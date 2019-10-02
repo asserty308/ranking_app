@@ -1,15 +1,17 @@
-class ListDM {
+class ListEntryDM {
   final String key;
   final String title;
   final String subtitle;
+  final String body;
   final int position;
 
-  ListDM({this.key, this.title, this.subtitle, this.position});
+  ListEntryDM({this.key, this.title, this.subtitle, this.body, this.position});
 
-  factory ListDM.fromMap(Map<String, dynamic> json) => ListDM(
+  factory ListEntryDM.fromMap(Map<String, dynamic> json) => ListEntryDM(
     key: json["key"],
     title: json["title"],
     subtitle: json["subtitle"],
+    body: json["body"],
     position: json["position"],
   );
 
@@ -17,6 +19,7 @@ class ListDM {
     "key": key,
     "title": title,
     "subtitle": subtitle,
+    "body": body,
     "position": position,
   };
 }

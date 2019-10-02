@@ -27,10 +27,13 @@ class RankingDatabaseProvider {
     
     return await openDatabase(
       path,
-      // When the database is first created, create a table to store dogs.
-      onCreate: (db, version) {
-        // Run the CREATE TABLE statement on the database.
-        return db.execute("CREATE TABLE Lists(key TEXT PRIMARY KEY, title TEXT, subtitle TEXT)");
+      // When the database is first created, create the necessary tables.
+      onCreate: (db, version) async {
+        // create table for Lists
+        await db.execute("CREATE TABLE Lists(key TEXT PRIMARY KEY, title TEXT, subtitle TEXT, position INTEGER)");
+
+        // create another table for ListEntrys
+        await db.execute("CREATE TABLE ListEntries(key TEXT PRIMARY KEY, title TEXT, subtitle TEXT, body TEXT, position INTEGER)");
       },
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
@@ -38,7 +41,7 @@ class RankingDatabaseProvider {
     );
   }
 
-  addNewList(ListDM list) async {
+  insertNewList(ListDM list) async {
     final db = await database;
     db.insert(
       'Lists', 
@@ -51,5 +54,25 @@ class RankingDatabaseProvider {
     final db = await database;
     var response = await db.query('Lists', where: 'key = ?', whereArgs: [key]);
     return response.isNotEmpty ? ListDM.fromMap(response.first) : null;
+  }
+
+  Future<List<ListDM>> getAllLists() async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db.query('Lists');
+
+    return List.generate(maps.length, (i) {
+      return ListDM(
+        key: maps[i]['key'],
+        title: maps[i]['title'],
+        subtitle: maps[i]['subtitle'],
+        position: maps[i]['index'],
+      );
+    });
+  }
+
+  Future<int> getListsLength() async {
+    final db = await database;
+    return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM Lists'));
   }
 }
