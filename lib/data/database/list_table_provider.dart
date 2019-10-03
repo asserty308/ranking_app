@@ -34,7 +34,7 @@ class ListTableProvider {
         key: maps[i]['key'],
         title: maps[i]['title'],
         subtitle: maps[i]['subtitle'],
-        position: maps[i]['index'],
+        position: maps[i]['position'],
       );
     });
   }

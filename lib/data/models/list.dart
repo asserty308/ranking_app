@@ -1,8 +1,8 @@
 class ListDM {
   final String key;
-  final String title;
-  final String subtitle;
-  final int position;
+  String title;
+  String subtitle;
+  int position;
 
   ListDM({this.key, this.title, this.subtitle, this.position});
 

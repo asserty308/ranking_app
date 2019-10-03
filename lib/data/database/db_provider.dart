@@ -1,6 +1,10 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+/// Provides acces to the app's database.
+/// 
+/// You can access the [database] from everywhere by calling [RankingDatabaseProvider.db.database].
+/// Use this class to update and upgrade the database.
 class RankingDatabaseProvider {
   // private constructor
   RankingDatabaseProvider._();
@@ -12,7 +16,7 @@ class RankingDatabaseProvider {
   Database _database;
   final int _version = 1;
 
-  // Singleton
+  /// Singleton access to the database instance
   Future<Database> get database async {
     if (_database != null)
       return _database;
