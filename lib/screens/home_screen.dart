@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list.dart';
 import 'package:ranking_app/screens/list_detail_screen.dart';
+import 'package:ranking_app/widgets/home_screen_list_tile.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  var listData = List<ListTile>();
+  var listData = List<Widget>();
 
   @override
   void initState() {
@@ -52,16 +53,20 @@ class HomeScreenState extends State<HomeScreen> {
 
     for (var m in models) {
       listData.add(
-        ListTile(
+        HomeScreenListTile(
           key: ValueKey(m.key),
-          title: Text(m.title),
-          onTap: () {
-            showList(context, m.key, m.title);
+          item: m, 
+          afterDelete: () {
+            reloadData();
           },
-         )
-       );
+          onTap: (item) {
+            showListDetail(context, item.key, item.title);
+          },
+        )
+      );
     }
 
+    // update UI to show the list
     setState(() { 
     });
   }
@@ -72,6 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
     var key = 'list_$title'.toLowerCase().replaceAll(' ', '_');
     final index = await ListTableProvider.table.tableCount();
 
+    // this shouldn't happen
     if (title == null) {
       return;
     }
@@ -142,11 +148,12 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void showEntryAlreadyExistsDialog(BuildContext context) {
-    showDialog<String>(
+    showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('A list with the desired name already exists. Please choose another title.'),
+          title: Text('Duplicate'),
+          content: Text('A list with the desired name already exists. Please choose another title.'),
           actions: <Widget>[
             FlatButton(
               child: Text('OK'),
@@ -158,7 +165,7 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void showList(BuildContext context, String key, String title) {
+  void showListDetail(BuildContext context, String key, String title) {
     Navigator.pushNamed(
       context, 
       '/list_detail',

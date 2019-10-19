@@ -58,7 +58,7 @@ class ListTableProvider {
     final db = await RankingDatabaseProvider.db.database;
     await db.delete(
       'Lists',
-      where: 'id = ?',
+      where: 'key = ?',
       whereArgs: [key],
     );
   }
