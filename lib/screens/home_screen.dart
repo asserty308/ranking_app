@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list.dart';
+import 'package:ranking_app/screens/delegates/home_screen_search_delegate.dart';
 import 'package:ranking_app/screens/list_detail_screen.dart';
+import 'package:ranking_app/utility/dialogs.dart';
 import 'package:ranking_app/widgets/home_screen_list_tile.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
 
@@ -26,6 +28,17 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Collection'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: HomeScreenSearchDelegate(),
+              );
+            },
+          )
+        ],
       ),
       body: MyReorderableList(
         listData: listData,
@@ -65,7 +78,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   /// Creates a list tile from the name entered in a dialog
   void addNewList(BuildContext context) async  {
-    final title = await showAddListDialog(context);
+    final title = await showInputDialog(context, 'New List', 'Title');
     var key = 'list_$title'.toLowerCase().replaceAll(' ', '_');
     final index = await ListTableProvider.table.tableCount();
 
@@ -98,63 +111,16 @@ class HomeScreenState extends State<HomeScreen> {
       position: index
     );
 
-    ListTableProvider.table.insert(newList);
+    await ListTableProvider.table.insert(newList);
 
     // reload data to show the new entry
-    setState(() {
-      reloadData();
-    });
+    reloadData();
   }
 
-  /// Returns the name of the list entered in the textfield
-  Future<String> showAddListDialog(BuildContext context) async {
-    String listName;
-
-    return showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('New List'),
-          content: TextField(
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: 'Name',
-            ),
-            onChanged: (value) {
-              listName = value;
-            },
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop()
-            ),
-            FlatButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop(listName)
-            )
-          ],
-        );
-      }
-    );
-  }
+  
 
   void showEntryAlreadyExistsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Duplicate'),
-          content: Text('A list with the desired name already exists. Please choose another title.'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop()
-            )
-          ],
-        );
-      }
-    );
+    showOKDialog(context, 'Duplicate', 'A list with the desired name already exists. Please choose another title.');
   }
 
   void showListDetail(BuildContext context, String key, String title) {

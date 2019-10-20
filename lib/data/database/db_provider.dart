@@ -14,7 +14,7 @@ class RankingDatabaseProvider {
 
   // private members
   Database _database;
-  final int _version = 1;
+  final int _version = 2;
 
   /// Singleton access to the database instance
   Future<Database> get database async {
@@ -35,8 +35,14 @@ class RankingDatabaseProvider {
         // create table for Lists
         await db.execute("CREATE TABLE Lists(key TEXT PRIMARY KEY, title TEXT, subtitle TEXT, position INTEGER)");
 
-        // create another table for ListEntrys
-        await db.execute("CREATE TABLE ListEntries(key TEXT PRIMARY KEY, title TEXT, subtitle TEXT, body TEXT, position INTEGER)");
+        // create another table for ListEntries
+        await db.execute("CREATE TABLE ListEntries(key TEXT PRIMARY KEY, title TEXT, subtitle TEXT, body TEXT, position INTEGER, list_fk TEXT)");
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < newVersion) {
+          // v1 to v2: add list_fk to ListEntries
+          await db.execute('ALTER TABLE ListEntries ADD COLUMN list_fk TEXT;');
+        }
       },
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
