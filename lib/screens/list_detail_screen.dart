@@ -32,9 +32,7 @@ class ListDetailScreenState extends State<ListDetailScreen> {
         listData: listData,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          addNewEntry(context);
-        },
+        onPressed: () => addNewEntry(context),
         tooltip: 'Add new entry',
         child: Icon(Icons.add),
       )

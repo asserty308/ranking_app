@@ -31,7 +31,7 @@ class MyReorderableListState extends State<MyReorderableList> {
 
           // Delay needed as a workaround for the error 'Multiple widgets used the same GlobalKey'
           // Flutter needs 20-50ms to refresh the keys 
-          Future.delayed(Duration(milliseconds: 20), () {
+          Future.delayed(Duration(milliseconds: 40), () {
             setState(() {
               // remove item at old index and add to new index
               final item = listData.removeAt(oldIndex);

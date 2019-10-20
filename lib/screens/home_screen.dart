@@ -29,14 +29,10 @@ class HomeScreenState extends State<HomeScreen> {
       ),
       body: MyReorderableList(
         listData: listData,
-        afterReorder: (oldIndex, newIndex) {
-          updateListIndices();
-        },
+        afterReorder: (oldIndex, newIndex) => updateListIndices(),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          addNewList(context);
-        },
+        onPressed: () => addNewList(context),
         tooltip: 'Add new list',
         child: Icon(Icons.add),
       ),
@@ -56,12 +52,8 @@ class HomeScreenState extends State<HomeScreen> {
         HomeScreenListTile(
           key: ValueKey(m.key),
           item: m, 
-          afterDelete: () {
-            reloadData();
-          },
-          onTap: (item) {
-            showListDetail(context, item.key, item.title);
-          },
+          shouldReloadData: () => reloadData(),
+          onTap: (item) => showListDetail(context, item.key, item.title),
         )
       );
     }
