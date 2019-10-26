@@ -3,7 +3,7 @@ class ListEntryDM {
   final String title;
   final String subtitle;
   final String body;
-  final int position;
+  int position;
   final String listKey;
 
   ListEntryDM({this.key, this.title, this.subtitle, this.body, this.position, this.listKey});

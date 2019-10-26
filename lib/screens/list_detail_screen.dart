@@ -49,6 +49,7 @@ class ListDetailScreenState extends State<ListDetailScreen> {
       ),
       body: MyReorderableList(
         listData: listData,
+        afterReorder: (oldIndex, newIndex) => updateListIndices(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => addNewEntry(context, listKey),
@@ -123,5 +124,19 @@ class ListDetailScreenState extends State<ListDetailScreen> {
 
     // reload data to show the new entry
     reloadData();
+  }
+
+  /// Updates ListEntryDM's indices in database by looking at listData.
+  /// 
+  /// Should be called on [afterReorder] when the re-indexed list is available.
+  Future<void> updateListIndices() async {
+    for (int i = 0; i < listData.length; i++) {
+      final tile = listData[i];
+      final key = (tile.key as ValueKey).value;
+      final entry = await ListEntryTableProvider.table.getWithKey(key);
+      entry.position = i;
+
+      ListEntryTableProvider.table.update(entry);
+    }
   }
 }
