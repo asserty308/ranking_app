@@ -77,6 +77,8 @@ class ListDetailScreenState extends State<ListDetailScreen> {
         ListTile(
           key: ValueKey(m.key),
           title: Text(m.title),
+          subtitle: Text(m.subtitle),
+          leading: Icon(Icons.format_list_bulleted), // TODO: Change to customizable image
         )
       );
     }
