@@ -82,7 +82,7 @@ class HomeScreenState extends State<HomeScreen> {
     var key = 'list_$title'.toLowerCase().replaceAll(' ', '_');
     final index = await ListTableProvider.table.tableCount();
 
-    // this shouldn't happen
+    // when user presses 'cancel' title could be null
     if (title == null) {
       return;
     }
@@ -103,11 +103,14 @@ class HomeScreenState extends State<HomeScreen> {
       key += 'x';
     }
 
+    // Ask the user for a subtitle - when user presses 'cancel' subtitle will be empty
+    final subtitle = await showInputDialog(context, 'Insert a subtitle for the list "$title"', 'Subtitle') ?? '';
+
     // create ListDM and add to db
     var newList = ListDM(
       key: key,
       title: title,
-      subtitle: '',
+      subtitle: subtitle,
       position: index
     );
 

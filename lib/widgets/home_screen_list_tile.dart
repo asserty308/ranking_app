@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ranking_app/data/database/list_entry_table_provider.dart';
 import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list.dart';
 import 'package:ranking_app/widgets/dismissible_background.dart';
@@ -30,7 +31,7 @@ class HomeScreenListTile extends StatelessWidget {
             child: Text('${item.title[0]}'),
           ),
           title: Text(item.title),
-          subtitle: Text('This will show a short description of the list.'),
+          subtitle: Text(item.subtitle),
           onTap: () => onTap(item),
         ),
       ),
@@ -43,18 +44,20 @@ class HomeScreenListTile extends StatelessWidget {
     // make a copy of the dismissed item to let the user undo the deletion
     var copy = await ListTableProvider.table.getWithKey(key);
 
-    // TODO: Keep a reference of all list entries
+    // Keep a reference of all list entries
     // Cannot wait for deletion of the items until the snackbar has disappeared because the user could close the app before. This will lead to unreferenced entries.
+    var entries = await ListEntryTableProvider.table.getAllFromList(key);
 
     // remove item from table
     ListTableProvider.table.delete(key);
 
-    // TODO: Delete all list entries
+    // Delete all list entries
+    ListEntryTableProvider.table.deleteAllInList(key);
 
     // reload after deletion
     shouldReloadData();
     
-    // Show a snackbar. This snackbar also contains an 'undo' action.
+    // Show a snackbar which also contains an 'undo' action.
     Scaffold
       .of(context)
       .showSnackBar(
@@ -63,8 +66,13 @@ class HomeScreenListTile extends StatelessWidget {
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () {
+              // 1) Insert the copy of the table
               ListTableProvider.table.insert(copy);
-              // TODO: Insert all list entries
+
+              // 2) Insert all copied list entries
+              for (var e in entries) {
+                ListEntryTableProvider.table.insert(e);
+              }
 
               // reload after restoring
               shouldReloadData();

@@ -9,21 +9,24 @@ class ListEntryTableProvider {
   // static access
   static final ListEntryTableProvider table = ListEntryTableProvider._();
 
-  Future<void> insert(ListEntryDM list) async {
+  /// Adds a new [entry] to the table [ListEntries].
+  Future<void> insert(ListEntryDM entry) async {
     final db = await RankingDatabaseProvider.db.database;
     await db.insert(
       'ListEntries', 
-      list.toMap(),
+      entry.toMap(),
       conflictAlgorithm: ConflictAlgorithm.abort
     );
   }
 
+  /// Fetches the entry with key [key] from the table [ListEntries].
   Future<ListEntryDM> getWithKey(String key) async {
     final db = await RankingDatabaseProvider.db.database;
     var response = await db.query('ListEntries', where: 'key = ?', whereArgs: [key]);
     return response.isNotEmpty ? ListEntryDM.fromMap(response.first) : null;
   }
 
+  /// Fetches all entries from the table [ListEntries].
   Future<List<ListEntryDM>> getAll() async {
     final db = await RankingDatabaseProvider.db.database;
 
@@ -40,6 +43,7 @@ class ListEntryTableProvider {
     });
   }
 
+  /// Fetches all entries belonging to the list with key [listKey].
   Future<List<ListEntryDM>> getAllFromList(String listKey) async {
     final db = await RankingDatabaseProvider.db.database;
 
@@ -56,32 +60,46 @@ class ListEntryTableProvider {
     });
   }
 
+  /// Returns the number of entries of the list with key [listKey].
   Future<int> listCount(String listKey) async {
     final db = await RankingDatabaseProvider.db.database;
     return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ListEntries WHERE list_fk = ?', [listKey]));
   }
 
+  /// Returns the number of entries inside the table [ListEntries].
   Future<int> tableCount() async {
     final db = await RankingDatabaseProvider.db.database;
     return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM ListEntries'));
   }
 
-  Future<void> update(ListEntryDM list) async {
+  /// Updates the entry with key [entry.key] to the new values of [entry].
+  Future<void> update(ListEntryDM entry) async {
     final db = await RankingDatabaseProvider.db.database;
     await db.update(
       'ListEntries', 
-      list.toMap(),
+      entry.toMap(),
       where: 'key = ?',
-      whereArgs: [list.key]
+      whereArgs: [entry.key]
     );
   }
 
+  /// Deletes the entry with key [key] from the table [ListEntries].
   Future<void> delete(String key) async {
     final db = await RankingDatabaseProvider.db.database;
     await db.delete(
       'ListEntries',
       where: 'key = ?',
       whereArgs: [key],
+    );
+  }
+
+  /// Removes all entries belonging to the list with key [listKey].
+  Future<void> deleteAllInList(String listKey) async {
+    final db = await RankingDatabaseProvider.db.database;
+    await db.delete(
+      'ListEntries',
+      where: 'list_fk = ?',
+      whereArgs: [listKey],
     );
   }
 }
