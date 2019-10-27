@@ -15,6 +15,10 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   var listData = List<Widget>();
 
+  // Add list validation
+  var newListTitleEmpty = false;
+  var newListDuplicate = false;
+
   @override
   void initState() {
     super.initState();
@@ -78,14 +82,33 @@ class HomeScreenState extends State<HomeScreen> {
 
   /// Creates a list tile from the name entered in a dialog
   void addNewList(BuildContext context) async  {
-    final title = await showInputDialog(context, 'New List', 'Title');
-    var key = 'list_$title'.toLowerCase().replaceAll(' ', '_');
-    final index = await ListTableProvider.table.tableCount();
+    // Look for errors from inputs (addNewList will be called again when the user enters invalid input)
+    var error = newListTitleEmpty ? 'The title can\'t be empty' : '';
+    
+    if (error.isEmpty) {
+      error = newListDuplicate ? 'Duplicate. Please choose another title.' : '';
+    }
 
-    // when user presses 'cancel' title could be null
+    // reset validations so future additions will not start with an error
+    newListTitleEmpty = false;
+    newListDuplicate = false;
+
+    // Ask the user for a list title - when user presses 'cancel' title will be null
+    final title = await showInputDialog(context, 'New List', 'Title', error);
+
     if (title == null) {
       return;
     }
+
+    if (title.isEmpty) {
+      // retry with error message
+      newListTitleEmpty = true;
+      addNewList(context);
+      return;
+    }
+
+    var key = 'list_$title'.toLowerCase().replaceAll(' ', '_');
+    final index = await ListTableProvider.table.tableCount();
 
     // check if entry with key already exists
     var existingEntry = await ListTableProvider.table.getWithKey(key);
@@ -93,8 +116,8 @@ class HomeScreenState extends State<HomeScreen> {
     if (existingEntry != null) {
       if (existingEntry.title == title) {
         // there can only be one list with the same title
-        showEntryAlreadyExistsDialog(context);
-        // alternative: ask user if he really wants to add two same titled lists
+        newListDuplicate = true;
+        addNewList(context);
         return;
       }
       
@@ -118,12 +141,6 @@ class HomeScreenState extends State<HomeScreen> {
 
     // reload data to show the new entry
     reloadData();
-  }
-
-  
-
-  void showEntryAlreadyExistsDialog(BuildContext context) {
-    showOKDialog(context, 'Duplicate', 'A list with the desired name already exists. Please choose another title.');
   }
 
   void showListDetail(BuildContext context, String key, String title) {
