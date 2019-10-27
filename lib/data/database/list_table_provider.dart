@@ -24,6 +24,12 @@ class ListTableProvider {
     return response.isNotEmpty ? ListDM.fromMap(response.first) : null;
   }
 
+  Future<ListDM> getWithTitle(String title) async {
+    final db = await RankingDatabaseProvider.db.database;
+    var response = await db.query('Lists', where: 'title = ?', whereArgs: [title]);
+    return response.isNotEmpty ? ListDM.fromMap(response.first) : null;
+  }
+
   Future<List<ListDM>> getAll() async {
     final db = await RankingDatabaseProvider.db.database;
 

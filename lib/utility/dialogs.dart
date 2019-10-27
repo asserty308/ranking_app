@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Returns the name of the list entered in the textfield
-Future<String> showInputDialog(BuildContext context, String title, String inputHint, [String withError = '']) async {
+Future<String> showInputDialog({BuildContext context, String title, String inputHint, String withError = ''}) async {
   String inputText;
 
   return showDialog<String>(
@@ -26,7 +26,13 @@ Future<String> showInputDialog(BuildContext context, String title, String inputH
           ),
           FlatButton(
             child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(inputText)
+            onPressed: () { 
+              // when 'OK' is pressed never return null - null indicates 'cancel'
+              if (inputText == null) {
+                inputText = '';
+              }
+              Navigator.of(context).pop(inputText); 
+            }
           )
         ],
       );

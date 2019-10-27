@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list.dart';
 import 'package:ranking_app/screens/delegates/home_screen_search_delegate.dart';
-import 'package:ranking_app/screens/list_detail_screen.dart';
 import 'package:ranking_app/utility/dialogs.dart';
 import 'package:ranking_app/widgets/home_screen_list_tile.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
+
+import 'list_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -70,7 +71,7 @@ class HomeScreenState extends State<HomeScreen> {
           key: ValueKey(m.key),
           item: m, 
           shouldReloadData: () => reloadData(),
-          onTap: (item) => showListDetail(context, item.key, item.title),
+          onTap: (item) => showScreenListDetail(context, item.key, item.title),
         )
       );
     }
@@ -94,7 +95,12 @@ class HomeScreenState extends State<HomeScreen> {
     newListDuplicate = false;
 
     // Ask the user for a list title - when user presses 'cancel' title will be null
-    final title = await showInputDialog(context, 'New List', 'Title', error);
+    final title = await showInputDialog(
+      context: context, 
+      title: 'New List', 
+      inputHint: 'Title', 
+      withError: error
+    );
 
     if (title == null) {
       return;
@@ -127,7 +133,11 @@ class HomeScreenState extends State<HomeScreen> {
     }
 
     // Ask the user for a subtitle - when user presses 'cancel' subtitle will be empty
-    final subtitle = await showInputDialog(context, 'Insert a subtitle for the list "$title"', 'Subtitle') ?? '';
+    final subtitle = await showInputDialog(
+      context: context, 
+      title: 'Insert a subtitle for the list "$title"', 
+      inputHint: 'Subtitle (optional)',
+    ) ?? '';
 
     // create ListDM and add to db
     var newList = ListDM(
@@ -143,14 +153,6 @@ class HomeScreenState extends State<HomeScreen> {
     reloadData();
   }
 
-  void showListDetail(BuildContext context, String key, String title) {
-    Navigator.pushNamed(
-      context, 
-      '/list_detail',
-      arguments: ListDetailScreenArguments(key, title),
-    );
-  }
-
   /// Updates ListDM's indices in database by looking at listData.
   /// 
   /// Should be called on [afterReorder] when the re-indexed list is available.
@@ -163,5 +165,19 @@ class HomeScreenState extends State<HomeScreen> {
 
       ListTableProvider.table.update(entry);
     }
+  }
+
+  void showScreenListDetail(BuildContext context, String key, String title) {
+    Navigator.pushNamed(
+      context, 
+      '/list_detail',
+      arguments: ListDetailScreenArguments(key, title),
+    ).then((value) {
+      // Called when coming back from 'ListDetailScreen' (e.g. when back button was pressed)
+      setState(() {
+        // reload data because the list name could've changed
+        reloadData();
+      });
+    });
   }
 }

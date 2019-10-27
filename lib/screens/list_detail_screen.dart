@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ranking_app/data/database/list_entry_table_provider.dart';
+import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list_entry.dart';
 import 'package:ranking_app/utility/dialogs.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
@@ -17,6 +18,7 @@ class ListDetailScreen extends StatefulWidget {
 
 class ListDetailScreenState extends State<ListDetailScreen> {
   var listData = List<Widget>();
+  var listTitle = '';
   var listKey = '';
 
   @override
@@ -30,16 +32,18 @@ class ListDetailScreenState extends State<ListDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final ListDetailScreenArguments args = ModalRoute.of(context).settings.arguments;
-    final String title = args.title;
-    this.listKey = args.listKey;
+
+    // only read once because listtitle can change on runtime
+    listTitle = listTitle.isEmpty ? args.title : listTitle;
+    listKey = args.listKey;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(listTitle),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.edit, color: Colors.white,),
-            onPressed: null,
+            onPressed: () => renameList(),
           ),
           IconButton(
             icon: Icon(Icons.info_outline, color: Colors.white,),
@@ -89,7 +93,7 @@ class ListDetailScreenState extends State<ListDetailScreen> {
   }
 
   void addNewEntry(BuildContext context, String listKey) async {
-    final title = await showInputDialog(context, 'New Entry', 'Title');
+    final title = await showInputDialog(context: context, title: 'New Entry', inputHint: 'Title');
     var key = '${listKey}_$title'.toLowerCase().replaceAll(' ', '_');
     final index = await ListEntryTableProvider.table.listCount(listKey);
 
@@ -140,5 +144,38 @@ class ListDetailScreenState extends State<ListDetailScreen> {
 
       ListEntryTableProvider.table.update(entry);
     }
+  }
+
+  Future<void> renameList() async {
+    // fetch list with current key
+    final entry = await ListTableProvider.table.getWithKey(listKey);
+
+    // Ask the user for the new list title - when user presses 'cancel' title will be null
+    var title = await showInputDialog(
+      context: context, 
+      title: 'Rename list', 
+      inputHint: 'New title',
+    );
+
+    if (title == null) {
+      return;
+    }
+
+    // set default value instead of showing an error
+    // this is not as critical as setting no title when creating a new list
+    if (title.isEmpty) {
+      title = '<unknown title>';
+    }
+
+    // update entry with new title
+    entry.title = title;
+
+    // update app bar title
+    listTitle = title;
+
+    ListTableProvider.table.update(entry);
+
+    setState(() {
+    });
   }
 }
