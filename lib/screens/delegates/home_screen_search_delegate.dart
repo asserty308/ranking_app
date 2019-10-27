@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ranking_app/data/database/list_table_provider.dart';
+import 'package:ranking_app/data/models/list.dart';
 
-class HomeScreenSearchDelegate extends SearchDelegate {
+class HomeScreenSearchDelegate extends SearchDelegate<ListDM> {
   @override
   List<Widget> buildActions(BuildContext context) {
     // add a 'clear query' button
@@ -25,13 +27,51 @@ class HomeScreenSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    // TODO: implement buildResults
-    return Container();
+    return showSearchResults();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // TODO: implement buildSuggestions
-    return Container();
+    return showSearchResults();
+  }
+
+  Widget showSearchResults() {
+    final searchResults = ListTableProvider.table.search(query);
+
+    return FutureBuilder<List<ListDM>>(
+      future: searchResults,
+      builder: (BuildContext context, AsyncSnapshot<List<ListDM>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          var widgetList = <Widget>[];
+
+          if (snapshot.data == null) {
+            return Center(child: Text('Nothing found.'));
+          }
+
+          for (var list in snapshot.data) {
+            widgetList.add(
+              ListTile(
+                title: Text(list.title),
+                onTap: () {
+                  Navigator.pop(context, list); // pop search delegate
+                },
+              )
+            );
+          }
+
+          return ListView.builder(
+            itemCount: widgetList.length,
+            itemBuilder: (context, index) {
+              return widgetList[index];
+            }
+          );
+        }
+
+        // show progress indicator when search results aren't available
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
   }
 }

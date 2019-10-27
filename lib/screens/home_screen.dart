@@ -36,12 +36,7 @@ class HomeScreenState extends State<HomeScreen> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: HomeScreenSearchDelegate(),
-              );
-            },
+            onPressed: () => showListSearch(context),
           )
         ],
       ),
@@ -179,5 +174,19 @@ class HomeScreenState extends State<HomeScreen> {
         reloadData();
       });
     });
+  }
+
+  Future<void> showListSearch(BuildContext context) async {
+    var selectedList = await showSearch<ListDM>(
+      context: context,
+      delegate: HomeScreenSearchDelegate(),
+    );
+
+    // when back button was pressed [selectedList] is null
+    if (selectedList == null) {
+      return;
+    }
+
+    showScreenListDetail(context, selectedList.key, selectedList.title);
   }
 }

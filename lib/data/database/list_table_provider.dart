@@ -68,4 +68,24 @@ class ListTableProvider {
       whereArgs: [key],
     );
   }
+
+  Future<List<ListDM>> search(String query) async {
+    var filteredLists = List<ListDM>();
+    var lowerQuery = query.toLowerCase();
+
+    if (lowerQuery.isEmpty) {
+      return filteredLists;
+    }
+
+    // fetch all lists and filter
+    final allLists = await getAll();
+
+    for (var list in allLists) {
+      if (list.title.toLowerCase().contains(lowerQuery) || list.subtitle.toLowerCase().contains(lowerQuery)) {
+        filteredLists.add(list);
+      }
+    }
+
+    return filteredLists;
+  }
 }
