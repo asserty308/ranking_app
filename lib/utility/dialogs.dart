@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Returns the name of the list entered in the textfield
-Future<String> showInputDialog({BuildContext context, String title, String inputHint, String withError = ''}) async {
+Future<String> showInputDialog({BuildContext context, String title, String inputHint, String initialText = '', String withError = ''}) async {
   String inputText;
 
   return showDialog<String>(
@@ -11,6 +11,9 @@ Future<String> showInputDialog({BuildContext context, String title, String input
         title: Text(title),
         content: TextField(
           autofocus: true,
+          controller: TextEditingController(
+            text: initialText,
+          ),
           decoration: InputDecoration(
             hintText: inputHint,
             errorText: withError.isNotEmpty ? withError : null,

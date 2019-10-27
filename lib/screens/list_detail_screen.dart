@@ -155,6 +155,7 @@ class ListDetailScreenState extends State<ListDetailScreen> {
       context: context, 
       title: 'Rename list', 
       inputHint: 'New title',
+      initialText: listTitle,
     );
 
     if (title == null) {
