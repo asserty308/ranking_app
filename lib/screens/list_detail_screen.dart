@@ -82,7 +82,11 @@ class ListDetailScreenState extends State<ListDetailScreen> {
           key: ValueKey(m.key),
           title: Text(m.title),
           subtitle: Text(m.subtitle),
-          leading: Icon(Icons.format_list_bulleted), // TODO: Change to customizable image
+          leading: CircleAvatar(
+            // TODO: Change to customizable image
+            backgroundColor: m.position % 2 == 0 ? Colors.blue.shade800 : Colors.blue.shade200,
+            child: Text('${m.position+1}'),
+          ),
         )
       );
     }
@@ -142,8 +146,10 @@ class ListDetailScreenState extends State<ListDetailScreen> {
       final entry = await ListEntryTableProvider.table.getWithKey(key);
       entry.position = i;
 
-      ListEntryTableProvider.table.update(entry);
+      await ListEntryTableProvider.table.update(entry);
     }
+
+    reloadData();
   }
 
   Future<void> renameList() async {
