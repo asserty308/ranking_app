@@ -81,7 +81,7 @@ class ListDetailScreenState extends State<ListDetailScreen> {
         ListTile(
           key: ValueKey(m.key),
           title: Text(m.title),
-          subtitle: Text(m.subtitle),
+          //subtitle: Text(m.subtitle),
           leading: CircleAvatar(
             // TODO: Change to customizable image
             backgroundColor: m.position % 2 == 0 ? Colors.blue.shade800 : Colors.blue.shade200,
