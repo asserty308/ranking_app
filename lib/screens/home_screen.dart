@@ -44,6 +44,19 @@ class HomeScreenState extends State<HomeScreen> {
         listData: listData,
         afterReorder: (oldIndex, newIndex) => updateListIndices(),
       ),
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            ListTile(
+              title: Text('Settings'),
+              leading: Icon(Icons.settings),
+              onTap: () {
+
+              },
+            )
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => addNewList(context),
         tooltip: 'Add new list',
