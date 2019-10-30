@@ -3,6 +3,7 @@ import 'package:ranking_app/data/database/list_entry_table_provider.dart';
 import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list_entry.dart';
 import 'package:ranking_app/utility/dialogs.dart';
+import 'package:ranking_app/widgets/dismissible_background.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
 
 class ListDetailScreenArguments {
@@ -17,6 +18,8 @@ class ListDetailScreen extends StatefulWidget {
 }
 
 class ListDetailScreenState extends State<ListDetailScreen> {
+  var _scaffoldKey = GlobalKey<ScaffoldState>();
+
   var listData = List<Widget>();
   var listTitle = '';
   var listKey = '';
@@ -38,6 +41,7 @@ class ListDetailScreenState extends State<ListDetailScreen> {
     listKey = args.listKey;
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(listTitle),
         actions: <Widget>[
@@ -78,14 +82,19 @@ class ListDetailScreenState extends State<ListDetailScreen> {
 
     for (var m in models) {
       listData.add(
-        ListTile(
-          key: ValueKey(m.key),
-          title: Text(m.title),
-          //subtitle: Text(m.subtitle),
-          leading: CircleAvatar(
-            // TODO: Change to customizable image
-            backgroundColor: m.position % 2 == 0 ? Colors.blue.shade800 : Colors.blue.shade200,
-            child: Text('${m.position+1}'),
+        Dismissible(
+          key: ValueKey('dismiss_${m.key}'),
+          background: DismissibleBackground(),
+          direction: DismissDirection.endToStart,
+          onDismissed: (direction) => deleteEntry(m),
+          child: ListTile(
+            title: Text(m.title),
+            //subtitle: Text(m.subtitle),
+            leading: CircleAvatar(
+              // TODO: Change to customizable image
+              backgroundColor: m.position % 2 == 0 ? Colors.blue.shade800 : Colors.blue.shade200,
+              child: Text('${m.position+1}'),
+            ),
           ),
         )
       );
@@ -184,5 +193,33 @@ class ListDetailScreenState extends State<ListDetailScreen> {
 
     setState(() {
     });
+  }
+
+  void deleteEntry(ListEntryDM entry) async {
+    // keep a reference for restoring
+    //var ref = await ListEntryTableProvider.table.getWithKey(entry.key);
+
+    // Delete all list entries
+    ListEntryTableProvider.table.delete(entry.key);
+
+    reloadData();
+
+    // Show a snackbar which also contains an 'undo' action.
+    _scaffoldKey.currentState
+      .showSnackBar(
+        SnackBar(
+          content: Text("${entry.title} has been deleted"),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              // respore entry
+              ListEntryTableProvider.table.insert(entry);
+
+              // reload after restoring
+              reloadData();
+            },
+          ),
+        )
+      );
   }
 }
