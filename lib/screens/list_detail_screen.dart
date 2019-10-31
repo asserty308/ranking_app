@@ -196,9 +196,6 @@ class ListDetailScreenState extends State<ListDetailScreen> {
   }
 
   void deleteEntry(ListEntryDM entry) async {
-    // keep a reference for restoring
-    //var ref = await ListEntryTableProvider.table.getWithKey(entry.key);
-
     // Delete all list entries
     ListEntryTableProvider.table.delete(entry.key);
 

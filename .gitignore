@@ -75,3 +75,4 @@
 # Fastlane
 android/fastlane**
 ios/fastlane**
+android/keystore.properties

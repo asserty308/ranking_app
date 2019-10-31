@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'package:ranking_app/data/database/list_table_provider.dart';
 import 'package:ranking_app/data/models/list.dart';
 import 'package:ranking_app/screens/delegates/home_screen_search_delegate.dart';
@@ -24,6 +25,8 @@ class HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     
+    registerQuickActions();
+
     // load existing lists from db
     reloadData();
   }
@@ -50,9 +53,7 @@ class HomeScreenState extends State<HomeScreen> {
             ListTile(
               title: Text('Settings'),
               leading: Icon(Icons.settings),
-              onTap: () {
-
-              },
+              onTap: () => showSettings(context),
             )
           ],
         ),
@@ -201,5 +202,23 @@ class HomeScreenState extends State<HomeScreen> {
     }
 
     showScreenListDetail(context, selectedList.key, selectedList.title);
+  }
+
+  void showSettings(BuildContext context) {
+    Navigator.pushNamed(context, '/settings');
+  }
+
+  /// Add and handle homescreen quick actions
+  void registerQuickActions() {
+    final quickActions = QuickActions();
+    quickActions.initialize((type) {
+      if (type == 'add_list') {
+        addNewList(context);
+      }
+    });
+
+    quickActions.setShortcutItems(<ShortcutItem>[
+      const ShortcutItem(type: 'add_list', localizedTitle: 'Add new list', icon: 'icon_add'),
+    ]);
   }
 }
