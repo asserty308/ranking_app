@@ -7,9 +7,9 @@ import 'package:ranking_app/widgets/dismissible_background.dart';
 import 'package:ranking_app/widgets/my_reorderable_list.dart';
 
 class ListDetailScreenArguments {
+  ListDetailScreenArguments(this.listKey, this.title);
   final String listKey;
   final String title;
-  ListDetailScreenArguments(this.listKey, this.title);
 }
 
 class ListDetailScreen extends StatefulWidget {
