@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  sqflite:
+  sqflite: any
   path: any
   quick_actions:
 
